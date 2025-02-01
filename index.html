@@ -42,7 +42,7 @@
         <button onclick="sendMessage()">Отправить</button>
     </div>
     <script>
-        function sendMessage() {
+        async function sendMessage() {
             let input = document.getElementById("user-input");
             let chatBox = document.getElementById("chat-box");
             if (input.value.trim() === "") return;
@@ -50,13 +50,25 @@
             let userMessage = document.createElement("div");
             userMessage.textContent = "Вы: " + input.value;
             chatBox.appendChild(userMessage);
+            
+            let userText = input.value;
             input.value = "";
             
-            setTimeout(() => {
-                let botMessage = document.createElement("div");
-                botMessage.textContent = "Бот: Ответ обрабатывается...";
-                chatBox.appendChild(botMessage);
-            }, 500);
+            let botMessage = document.createElement("div");
+            botMessage.textContent = "Бот: Ответ обрабатывается...";
+            chatBox.appendChild(botMessage);
+            
+            try {
+                let response = await fetch("https://alidlnrko.github.io/ai-algebra/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: userText })
+                });
+                let data = await response.json();
+                botMessage.textContent = "Бот: " + data.reply;
+            } catch (error) {
+                botMessage.textContent = "Бот: Ошибка соединения";
+            }
         }
     </script>
 </body>
